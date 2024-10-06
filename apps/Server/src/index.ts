@@ -25,7 +25,7 @@ app.use(bodyParser.raw());
 
 // Start server
 const server = app.listen(port, () => {
-	console.log(`[http server]: Server is running at http://localhost:${port}`);
+  console.log(`[http server]: Server is running at http://localhost:${port}`);
 });
 
 // Instantiate WebSocketHandler
