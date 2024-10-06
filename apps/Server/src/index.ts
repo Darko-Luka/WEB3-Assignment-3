@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import errorHandler from "./middlewares/globalErrorHandler";
 import { WebSocketHandler } from "./lib/webSocketHandler";
+import loginController from "./controllers/authController";
 
 dotenv.config();
 
@@ -23,9 +24,11 @@ app.use(bodyParser.raw());
 
 // --- END MIDDLEWARES ---
 
+app.use("/" + apiVersion, loginController);
+
 // Start server
 const server = app.listen(port, () => {
-  console.log(`[http server]: Server is running at http://localhost:${port}`);
+	console.log(`[http server]: Server is running at http://localhost:${port}`);
 });
 
 // Instantiate WebSocketHandler
