@@ -1,11 +1,12 @@
 import { MongoClient, Db } from "mongodb";
 
 const pass = process.env.DB_PASS;
+const username = process.env.DB_USERNAME;
 
 export class MongoDBClient {
 	private static instance: MongoClient | null = null;
 	private static db: Db | null = null;
-	private static readonly uri: string = `mongodb+srv://lukaudovicic10:${pass}@cluster0.6hgea.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+	private static readonly uri: string = `mongodb+srv://${username}:${pass}@cluster0.6hgea.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 	private static readonly dbName: string = "UnoDB";
 
 	// Private constructor to prevent instantiation
