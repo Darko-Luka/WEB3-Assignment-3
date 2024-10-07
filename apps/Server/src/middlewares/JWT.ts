@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import HTTPError from "../lib/error-handling/HTTPError";
+import { AuthenticatedRequest } from "../lib/globalTypes";
 
-// Define a new interface that extends the existing Request interface
-interface AuthenticatedRequest extends Request {
-	authData?: any;
-}
+type AuthData = {
+	username: string;
+};
 
 export function verifyToken(req: AuthenticatedRequest, res: Response, next: NextFunction) {
 	const token: string | undefined = req.headers["authorization"] as string;
@@ -32,4 +33,11 @@ export function isUserVerified(token: string): boolean {
 		// If verification fails, return false
 		return false;
 	}
+}
+
+export async function validateAuthData(req: AuthenticatedRequest): Promise<AuthData> {
+	const authData = req.authData;
+	if (authData === undefined) throw new HTTPError(401, "Access denied!");
+
+	return authData;
 }

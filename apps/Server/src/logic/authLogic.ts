@@ -15,7 +15,7 @@ const authLogic = {
 		if (user) {
 			const { pass, ...userWithoutPass } = user;
 
-			return jwt.sign({ tokenPayload: userWithoutPass }, process.env.JWT_SECRET_KEY || "", {
+			return jwt.sign(userWithoutPass, process.env.JWT_SECRET_KEY || "", {
 				expiresIn: "30min",
 			});
 		} else {
