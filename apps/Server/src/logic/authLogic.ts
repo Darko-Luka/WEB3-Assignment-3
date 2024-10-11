@@ -6,7 +6,7 @@ import { RegisterEntity, RegisterType } from "../entities/registerEntity";
 
 const authLogic = {
 	login: async (login: LoginType): Promise<string> => {
-		LoginEntity.parse(login);
+		await LoginEntity.parseAsync(login);
 
 		const user = await (await MongoDBClient.getDatabase())
 			.collection("Users")

@@ -12,10 +12,8 @@ export class MongoDBClient {
 	private static readonly uri: string = `mongodb+srv://${username}:${pass}@cluster0.6hgea.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 	private static readonly dbName: string = "UnoDB";
 
-	// Private constructor to prevent instantiation
 	private constructor() {}
 
-	// Method to get the MongoClient instance
 	public static async getInstance(): Promise<MongoClient> {
 		if (!MongoDBClient.instance) {
 			MongoDBClient.instance = new MongoClient(MongoDBClient.uri);
@@ -25,7 +23,6 @@ export class MongoDBClient {
 		return MongoDBClient.instance;
 	}
 
-	// Method to get the database instance
 	public static async getDatabase(): Promise<Db> {
 		if (!MongoDBClient.db) {
 			const client = await MongoDBClient.getInstance();
@@ -34,7 +31,6 @@ export class MongoDBClient {
 		return MongoDBClient.db;
 	}
 
-	// Optional method to close the client
 	public static async close(): Promise<void> {
 		if (MongoDBClient.instance) {
 			await MongoDBClient.instance.close();

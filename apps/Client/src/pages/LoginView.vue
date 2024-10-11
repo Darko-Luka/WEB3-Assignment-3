@@ -9,7 +9,7 @@
 		</form>
 
 		<RouterLink to="/register">
-			<p class="text-sm underline text-blue-500 pt-8">Create an account</p>
+			<p class="text-sm underline text-blue-500 mt-8">Create an account</p>
 		</RouterLink>
 	</div>
 </template>
@@ -24,7 +24,6 @@ import { RouterLink } from "vue-router";
 const authStore = useAuthStore();
 const username = ref("");
 const password = ref("");
-const error = ref(authStore.error);
 
 const handleLogin = async () => {
 	await authStore.login(username.value, password.value);

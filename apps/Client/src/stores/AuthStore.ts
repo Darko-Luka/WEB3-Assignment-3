@@ -16,7 +16,6 @@ export const useAuthStore = defineStore("auth", () => {
 					headers: { Authorization: `${token.value}` },
 				});
 				user.value = response.data.user;
-				console.log(response.data.user);
 			} catch (err: any) {
 				console.error("Failed to load user on mount", err);
 				logout();

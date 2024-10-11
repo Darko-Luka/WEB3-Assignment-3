@@ -5,7 +5,7 @@ import HTTPError from "../lib/error-handling/HTTPError";
 const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
 	// Catching and handling HTTPError's
 	if (err instanceof HTTPError) {
-		console.log(err);
+		console.error(err);
 		res.status(err.status).send(err.serializeError());
 	}
 
