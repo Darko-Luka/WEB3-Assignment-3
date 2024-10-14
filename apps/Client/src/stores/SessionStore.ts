@@ -1,16 +1,22 @@
 import { defineStore } from "pinia";
 import { onUnmounted, ref } from "vue";
 
-//TODO: session screen:
-// host: start session
-// player: leave session
-// if host leaves the session is deleted
-
 export const useSessionStore = defineStore("gameSession", () => {
 	const ws = ref<WebSocket | null>(null);
 	const sessions = ref<{ id: string; maxPlayers: number; name: string; players: number }[]>([]);
+	const currentSessionId = ref<string | null>(null);
+	const onMessage = ref<Array<(data: any) => void>>([]);
+	const isHost = ref(false);
 	const isConnected = ref(false);
 	const error = ref<any>(null);
+
+	function onMessageSubscribe(callback: (data: any) => void) {
+		onMessage.value.push(callback);
+	}
+
+	function onMessageUnsubscribe(callback: (data: any) => void) {
+		onMessage.value = onMessage.value.filter((sub) => sub !== callback);
+	}
 
 	const connect = (url: string) => {
 		ws.value = new WebSocket(url);
@@ -21,7 +27,9 @@ export const useSessionStore = defineStore("gameSession", () => {
 
 		ws.value.onmessage = (event) => {
 			const data = JSON.parse(event.data);
+			onMessage.value.forEach((callback) => callback(data));
 			if (data.type === "notify") sessions.value = data.data;
+			if (data.type === "checkGameSessionPrivileges") isHost.value = data.data.isHost;
 		};
 
 		ws.value.onerror = (err) => {
@@ -51,5 +59,9 @@ export const useSessionStore = defineStore("gameSession", () => {
 		sessions,
 		isConnected,
 		error,
+		isHost,
+		onMessageSubscribe,
+		onMessageUnsubscribe,
+		currentSessionId,
 	};
 });

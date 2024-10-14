@@ -5,7 +5,7 @@
 			<Input type="text" v-model="username" placeholder="Username" required />
 			<Input type="password" v-model="password" placeholder="Password" required />
 			<p class="text-xs text-red-500" v-if="authStore.error">{{ authStore.error }}</p>
-			<Button type="submit">Register</Button>
+			<Button type="submit">Cancel</Button>
 		</form>
 
 		<RouterLink to="/login">

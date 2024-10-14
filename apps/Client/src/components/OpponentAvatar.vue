@@ -16,7 +16,7 @@
 					}
 				"
 				size="xs"
-				>Accuse</Button
+				>Cancel</Button
 			>
 		</div>
 	</div>

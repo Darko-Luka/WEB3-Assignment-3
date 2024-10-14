@@ -8,7 +8,7 @@
 			class="first:ml-auto last:mr-auto"
 			@click="() => store.sayUno(playerIndex)"
 			v-if="cards.length === 1"
-			>Say Uno!</Button
+			>Cancel</Button
 		>
 	</ol>
 </template>

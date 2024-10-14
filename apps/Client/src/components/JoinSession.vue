@@ -26,5 +26,7 @@ function handleJoin(sessionId: string) {
 		type: "joinSession",
 		data: { sessionId },
 	});
+
+	store.currentSessionId = sessionId;
 }
 </script>

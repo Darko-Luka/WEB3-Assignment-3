@@ -28,10 +28,21 @@ import {
 	NumberFieldInput,
 } from "@/components/ui/number-field";
 import { useSessionStore } from "@/stores/SessionStore";
+import { useAuthStore } from "@/stores/AuthStore";
 
 const playerCount = ref(2);
 const sessionName = ref("");
 const sessionStore = useSessionStore();
+const authStore = useAuthStore();
+
+const handleCreatedSessionCallback = (data: any) => {
+	if (data.type !== "sessionCreated") return;
+
+	const { sessionId } = data.data;
+	sessionStore.currentSessionId = sessionId;
+};
+
+sessionStore.onMessageSubscribe(handleCreatedSessionCallback);
 
 function createSession() {
 	sessionStore.sendMessage({
@@ -39,6 +50,7 @@ function createSession() {
 		data: {
 			maxPlayers: playerCount.value,
 			name: sessionName.value,
+			hostUsername: authStore.user?.username,
 		},
 	});
 

@@ -9,6 +9,7 @@ export interface AuthenticatedRequest extends Request {
 export type GameSession = {
 	id: string;
 	name: string;
+	hostUsername: string;
 	players: Set<WebSocket>;
 	maxPlayers: number;
 };

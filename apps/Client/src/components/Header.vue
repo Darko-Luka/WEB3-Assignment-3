@@ -1,7 +1,7 @@
 <template>
 	<div class="py-4 w-full flex justify-between px-2" v-if="authStore.user">
 		<Label>Logged in as {{ authStore.user.username }}</Label>
-		<Button @click="authStore.logout()">log out</Button>
+		<Button @click="authStore.logout()">Logout</Button>
 	</div>
 </template>
 

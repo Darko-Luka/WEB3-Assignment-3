@@ -7,7 +7,7 @@
 			</li>
 		</ol>
 		<RouterLink to="/">
-			<Button size="lg" class="my-4"> Play again </Button>
+			<Button size="lg" class="my-4">Cancel</Button>
 		</RouterLink>
 	</div>
 </template>
