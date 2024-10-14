@@ -17,7 +17,7 @@
 import { defineProps } from "vue";
 import CardComponent from "./CardComponent.vue";
 import Button from "./ui/button/Button.vue";
-import type { Card, CardColor, CardType } from "@/model/deck";
+import type { Card, CardColor, CardType } from "../../../Server/src/model/deck";
 import { cn } from "@/lib/utils";
 import { useGameStore } from "@/stores/GameStore";
 

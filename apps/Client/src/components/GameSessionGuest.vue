@@ -9,9 +9,11 @@
 import { useSessionStore } from "@/stores/SessionStore";
 import { onMounted, ref } from "vue";
 import Button from "./ui/button/Button.vue";
+import { useRouter } from "vue-router";
 const players = ref<{ username: string; isHost: boolean }[]>([]);
 
 const store = useSessionStore();
+const router = useRouter();
 
 function handleLeave() {
 	store.sendMessage({
@@ -40,5 +42,11 @@ store.onMessageSubscribe((data) => {
 	if (data.type !== "sessionDeleted") return;
 
 	store.currentSessionId = null;
+});
+
+store.onMessageSubscribe((data) => {
+	if (data.type !== "startGame") return;
+
+	router.push("/game");
 });
 </script>

@@ -28,7 +28,7 @@ import Label from "./ui/label/Label.vue";
 import { defineProps } from "vue";
 import Score from "./Score.vue";
 import { useGameStore } from "@/stores/GameStore";
-import type { Card } from "@/model/deck";
+import type { Card } from "../../../Server/src/model/deck";
 import Button from "./ui/button/Button.vue";
 
 const store = useGameStore();

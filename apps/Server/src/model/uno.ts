@@ -1,6 +1,6 @@
 import { type Shuffler, standardRandomizer } from "./utils/random_utils";
-import type { Card } from "./deck";
 import { createHand, Hand } from "./hand";
+import { Card } from "global-types";
 
 export type Props = {
 	players: Array<string>;

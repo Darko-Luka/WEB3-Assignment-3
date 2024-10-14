@@ -1,8 +1,8 @@
-import { type Card } from "../deck";
 import { Hand } from "../hand";
 import { type Shuffler, standardShuffler } from "./random_utils";
 import { type CardPredicate, type CardSpec, is, not } from "./predicates";
 import { type HandProps, createHand, createInitialDeck } from "./test_adapter";
+import { Card } from "global-types";
 
 export function constrainedShuffler(...constraints: [number, CardPredicate][]): Shuffler<Card> {
 	return (cards: Card[]) => {

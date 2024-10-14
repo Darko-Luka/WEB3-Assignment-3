@@ -1,0 +1,7 @@
+{
+	"name": "global-types",
+	"types": "src/globalTypes.d.ts",
+	"dependencies": {
+		"typescript": "latest"
+	}
+}

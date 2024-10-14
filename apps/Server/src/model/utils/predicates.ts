@@ -1,4 +1,4 @@
-import { type Card, type CardColor, type CardType } from "../deck";
+import { Card, CardColor, CardType } from "global-types";
 
 export type CardPredicate = (_: Card | undefined) => boolean;
 

@@ -2,6 +2,7 @@ import { type Shuffler, standardShuffler } from "./random_utils";
 import * as deck from "../deck";
 import * as hand from "../hand";
 import * as uno from "../uno";
+import { Card } from "global-types";
 
 export function createInitialDeck(): deck.Deck {
 	return deck.createInitialDeck();
@@ -10,7 +11,7 @@ export function createInitialDeck(): deck.Deck {
 export type HandProps = {
 	players: string[];
 	dealer: number;
-	shuffler?: Shuffler<deck.Card>;
+	shuffler?: Shuffler<Card>;
 	cardsPerPlayer?: number;
 };
 

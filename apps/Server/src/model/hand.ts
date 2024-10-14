@@ -1,29 +1,25 @@
 import { type Shuffler, standardShuffler, swapObjects } from "./utils/random_utils";
 import * as deck from "../../src/model/deck";
-
-export type UnoFailure = {
-	accuser: number;
-	accused: number;
-};
+import { Card, CardColor, UnoFailure } from "global-types";
 
 type EndCallback = (event: { winner: number }) => void;
 
 export class Hand {
 	private players: string[];
-	private playerHands: deck.Card[][];
+	private playerHands: Card[][];
 	private playerUnos: boolean[];
 	public dealer: number;
-	private shuffler?: Shuffler<deck.Card>;
+	private shuffler?: Shuffler<Card>;
 	private cardsPerPlayer?: number;
 	private _drawPile: deck.Deck;
 	private _discardPile: deck.Deck;
 	private _playerInTurn: number;
 	private isReverse: boolean;
-	private selectedColor?: deck.CardColor;
+	private selectedColor?: CardColor;
 	private _score?: number;
 	public endCallbacks: EndCallback[] = [];
 
-	constructor(players: string[], dealer: number, shuffler?: Shuffler<deck.Card>, cardsPerPlayer?: number) {
+	constructor(players: string[], dealer: number, shuffler?: Shuffler<Card>, cardsPerPlayer?: number) {
 		if (players.length < 2) throw new Error("Not enough player");
 		if (players.length > 10) throw new Error("To many players");
 		this.players = players;
@@ -52,7 +48,7 @@ export class Hand {
 		return this.players[index];
 	}
 
-	playerHand(index: number): deck.Card[] {
+	playerHand(index: number): Card[] {
 		if (index < 0) throw new Error("Player hand index out of bounds");
 		if (index >= this.playerHands.length) throw new Error("Player hand index out of bounds");
 		return this.playerHands[index];
@@ -72,7 +68,7 @@ export class Hand {
 		return this._playerInTurn;
 	}
 
-	play(cardIndex: number, nextColor?: deck.CardColor): deck.Card {
+	play(cardIndex: number, nextColor?: CardColor): Card {
 		if (!this.canPlay(cardIndex)) throw new Error("Can not play the card"); // Checks if the move is legal
 
 		this.selectedColor = undefined;
@@ -307,7 +303,7 @@ export class Hand {
 		else this._drawPile.shuffle(standardShuffler);
 	}
 
-	private handleLogicForSpecialCards(card: deck.Card) {
+	private handleLogicForSpecialCards(card: Card) {
 		switch (card.type) {
 			case "REVERSE":
 				// If there is two players, reverse card acts like a skip card.
@@ -343,7 +339,7 @@ export class Hand {
 export function createHand(
 	players: string[],
 	dealer: number,
-	shuffler?: Shuffler<deck.Card>,
+	shuffler?: Shuffler<Card>,
 	cardsPerPlayer?: number
 ): Hand {
 	const hand = new Hand(players, dealer, shuffler, cardsPerPlayer);

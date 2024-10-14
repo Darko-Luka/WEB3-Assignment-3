@@ -1,15 +1,8 @@
+import { Card, CardColor } from "global-types";
 import type { CardPredicate } from "./utils/predicates";
 import type { Shuffler } from "./utils/random_utils";
 
-export type CardType = "SKIP" | "NUMBERED" | "REVERSE" | "DRAW" | "WILD" | "WILD DRAW";
-export type CardColor = "BLUE" | "GREEN" | "RED" | "YELLOW";
 export const colors: CardColor[] = ["BLUE", "GREEN", "RED", "YELLOW"];
-
-export interface Card {
-	type: CardType;
-	color?: CardColor;
-	number?: number;
-}
 
 export class Deck {
 	private cards: Card[];

@@ -4,12 +4,12 @@
 			<ScoreTarget :targetScore="store.getTargetScore()" />
 			<div class="flex items-center justify-between w-1/2 mx-auto p-6">
 				<OpponentAvatar
-					v-for="bot in store.bots"
-					:cards="store.players[bot.index].deck"
-					:key="bot.index"
-					:isActive="store.isPlayerInTurn(bot.index)"
-					:name="bot.name"
-					:id="bot.index"
+					v-for="player in store.players"
+					:cards="store.players[player.index].deck"
+					:key="player.index"
+					:isActive="store.isPlayerInTurn(player.index)"
+					:name="player.name"
+					:id="player.index"
 				/>
 			</div>
 		</div>
