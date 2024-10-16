@@ -6,6 +6,7 @@ import errorHandler from "./middlewares/globalErrorHandler";
 import { WebSocketHandler } from "./lib/webSocketHandler";
 import loginController from "./controllers/authController";
 import GameSessionsHandler from "./lib/game-session/gameSessionHandler";
+import GameHandler from "./lib/game/gameHandler";
 
 dotenv.config();
 
@@ -36,6 +37,7 @@ const server = app.listen(port, () => {
 WebSocketHandler.createGlobalInstance(server);
 
 new GameSessionsHandler().init();
+new GameHandler().init();
 
 // Error Handling middleware
 app.use(errorHandler);

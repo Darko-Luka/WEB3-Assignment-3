@@ -2,6 +2,7 @@ import { GameSession } from "../globalTypes";
 import { WebSocketHandler } from "../webSocketHandler";
 import WebSocket from "ws";
 import uuid4 from "uuid4";
+import GameHandler from "../game/gameHandler";
 
 export default class GameSessionsHandler {
 	type: string = "gameSession";
@@ -37,6 +38,24 @@ export default class GameSessionsHandler {
 					data: { sessionId },
 				})
 			);
+		});
+
+		WebSocketHandler.getInstance().subscribeEvent(this.type, "startGame", ({ webSocketMessage }) => {
+			const { sessionId } = webSocketMessage.data;
+			const session = this.sessions.get(sessionId);
+			if (!session) return;
+
+			const playerMap: Map<string, null> = new Map();
+			session.players.forEach((player: WebSocket) => {
+				const username = this.connections.get(player);
+				if (username) {
+					playerMap.set(username, null);
+				}
+
+				player.send(JSON.stringify({ type: "gameStart" }));
+			});
+
+			GameHandler.addGame(session.id, playerMap);
 		});
 
 		WebSocketHandler.getInstance().subscribeEvent(this.type, "joinSession", ({ webSocketMessage, ws }) => {
@@ -129,7 +148,7 @@ export default class GameSessionsHandler {
 		});
 	}
 
-	notifyAll() {
+	private notifyAll() {
 		const sessionData = Array.from(this.sessions.values()).map((session) => {
 			return {
 				...session,
@@ -148,7 +167,7 @@ export default class GameSessionsHandler {
 		});
 	}
 
-	notifySessionUsers(sessionId: string) {
+	private notifySessionUsers(sessionId: string) {
 		const session = this.sessions.get(sessionId);
 		if (!session) return;
 

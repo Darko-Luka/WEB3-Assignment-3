@@ -8,7 +8,6 @@ export const useSessionStore = defineStore("gameSession", () => {
 	const onMessage = ref<Array<(data: any) => void>>([]);
 	const isHost = ref(false);
 	const isConnected = ref(false);
-	const error = ref<any>(null);
 
 	function onMessageSubscribe(callback: (data: any) => void) {
 		onMessage.value.push(callback);
@@ -30,10 +29,6 @@ export const useSessionStore = defineStore("gameSession", () => {
 			onMessage.value.forEach((callback) => callback(data));
 			if (data.type === "notify") sessions.value = data.data;
 			if (data.type === "checkGameSessionPrivileges") isHost.value = data.data.isHost;
-		};
-
-		ws.value.onerror = (err) => {
-			error.value = err;
 		};
 
 		ws.value.onclose = () => {
@@ -58,7 +53,6 @@ export const useSessionStore = defineStore("gameSession", () => {
 		sendMessage,
 		sessions,
 		isConnected,
-		error,
 		isHost,
 		onMessageSubscribe,
 		onMessageUnsubscribe,

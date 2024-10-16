@@ -1,4 +1,5 @@
 <template>
+	<!--
 	<div class="w-full h-[720px] flex flex-col justify-between table-image">
 		<div class="flex justify-between items-center">
 			<ScoreTarget :targetScore="store.getTargetScore()" />
@@ -24,6 +25,7 @@
 			<Score :score="store.getPlayerScore(playerIndex)" />
 		</div>
 	</div>
+	-->
 </template>
 
 <script setup lang="ts">
@@ -34,16 +36,21 @@ import PlayerDeck from "@/components/PlayerDeck.vue";
 import Score from "@/components/Score.vue";
 import ScoreTarget from "@/components/ScoreTarget.vue";
 import { useGameStore } from "@/stores/GameStore";
+import { onMounted } from "vue";
 import { useRouter } from "vue-router";
 
 const store = useGameStore();
 const router = useRouter();
 
+onMounted(() => {
+	store.createGame();
+});
+
 // We are always assuming the player (you), is index 0
 const playerIndex = 0;
 
 try {
-	store.players[playerIndex].deck;
+	// store.players[playerIndex].deck;
 } catch {
 	// check if the game was initialized properly, if no go back to the home view
 	router.push("/").then(() => location.reload());

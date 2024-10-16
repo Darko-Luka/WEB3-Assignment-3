@@ -12,22 +12,18 @@
 import { useSessionStore } from "@/stores/SessionStore";
 import { onMounted, ref } from "vue";
 import Button from "./ui/button/Button.vue";
-import { useAuthStore } from "@/stores/AuthStore";
 import router from "@/router";
 const players = ref<{ username: string; isHost: boolean }[]>([]);
 
 const store = useSessionStore();
-const authSession = useAuthStore();
 
 function handlePlay() {
 	store.sendMessage({
 		type: "startGame",
 		data: {
-			username: authSession.user?.username,
+			sessionId: store.currentSessionId,
 		},
 	});
-
-	router.push("/game");
 }
 
 function handleCancel() {
@@ -51,5 +47,11 @@ store.onMessageSubscribe((data) => {
 	if (data.type !== "getAllPlayersFromSession") return;
 
 	players.value = data.data;
+});
+
+store.onMessageSubscribe((data) => {
+	if (data.type !== "gameStart") return;
+
+	router.push("/game");
 });
 </script>

@@ -45,7 +45,7 @@ store.onMessageSubscribe((data) => {
 });
 
 store.onMessageSubscribe((data) => {
-	if (data.type !== "startGame") return;
+	if (data.type !== "gameStart") return;
 
 	router.push("/game");
 });
