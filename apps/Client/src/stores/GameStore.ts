@@ -42,20 +42,20 @@ export const useGameStore = defineStore("game", () => {
 		nextTurn();
 	}
 
-	function play(cardIndex: number, nextColor?: CardColor) {
+	function draw() {
+		engineService.draw();
+		updateAllPlayerDecks();
+		nextTurn();
+	}
+
+	async function play(cardIndex: number, nextColor?: CardColor) {
 		try {
-			engineService.play(cardIndex, nextColor);
+			await engineService.play(cardIndex, nextColor);
 			updateAllPlayerDecks();
 			nextTurn();
 		} catch {
 			alert("Illegal card play");
 		}
-	}
-
-	function draw() {
-		engineService.draw();
-		updateAllPlayerDecks();
-		nextTurn();
 	}
 
 	async function getPlayerScore(index: number): Promise<number> {
@@ -84,13 +84,13 @@ export const useGameStore = defineStore("game", () => {
 		return engineService.getTargetScore();
 	}
 
-	function nextTurn() {
-		currentPlayerIndex.value = engineService.getCurrentPlayer().index;
+	async function nextTurn() {
+		currentPlayerIndex.value = (await engineService.getCurrentPlayer()).index;
 	}
 
 	function updateAllPlayerDecks() {
-		players.value.forEach((player) => {
-			player.deck = engineService.getPlayerDeck(player.index) ?? [];
+		players.value.forEach(async (player) => {
+			player.deck = await engineService.getPlayerDeck(player.index) ?? [];
 		});
 	}
 

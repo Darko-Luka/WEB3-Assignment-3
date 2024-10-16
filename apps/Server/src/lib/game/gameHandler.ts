@@ -67,7 +67,21 @@ export default class GameHandler {
 			ws.send(
 				JSON.stringify({
 					type: "getPlayerDeck",
-					data: game.hand?.playerHand(index),
+					data: [...(game.hand?.playerHand(index) ?? [])],
+				})
+			);
+		});
+
+		WebSocketHandler.getInstance().subscribeEvent(this.type, "play", ({ ws, webSocketMessage }) => {
+			const game = this.findGameByWebSocket(ws);
+			if (!game) return;
+
+			const { cardIndex, nextColor } = webSocketMessage;
+
+			ws.send(
+				JSON.stringify({
+					type: "play",
+					data: game.hand?.play(cardIndex, nextColor),
 				})
 			);
 		});

@@ -61,7 +61,15 @@ export class EngineService implements EngineInterface {
 		throw new Error("Method not implemented.");
 	}
 	async play(cardIndex: number, nextColor?: CardColor): Promise<Card | undefined> {
-		throw new Error("Method not implemented.");
+		return new Promise((resolve) => {
+			this.sendMessage({ type: "play", data: { cardIndex, nextColor } });
+
+			this.subscribeOnMessage((event) => {
+				if (event.type !== "play") return;
+
+				resolve(event.data);
+			});
+		});
 	}
 	get getDiscardPileTopCard(): Promise<Ref<Card | undefined, Card | undefined>> {
 		throw new Error("Method not implemented.");
