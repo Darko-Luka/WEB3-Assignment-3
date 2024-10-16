@@ -13,6 +13,6 @@ export interface EngineInterface {
 	sayUno(index: number): void; // Darko
 	catchUnoFailure(unoFailure: UnoFailure): Promise<boolean>; // Luka - Done (samo se zajebavat i prcit)
 	getTargetScore(): Promise<number>; // Darko
-	subscribeOnEnd(callback: () => void): void; // Luka
+	subscribeOnEnd(callback: () => void): void; // Luka - Done (sjebano rame)
 	unsubscribeOnEnd(callback: () => void): void; // Darko
 }

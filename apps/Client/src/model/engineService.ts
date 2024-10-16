@@ -102,7 +102,13 @@ export class EngineService implements EngineInterface {
 		throw new Error("Method not implemented.");
 	}
 	subscribeOnEnd(callback: () => void): void {
-		throw new Error("Method not implemented.");
+		this.subscribeOnMessage((event) => {
+			if(event.type !== "subscribeOnEnd")
+			{
+				callback();
+			}
+		})
+		
 	}
 	unsubscribeOnEnd(callback: () => void): void {
 		throw new Error("Method not implemented.");
