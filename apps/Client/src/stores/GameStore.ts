@@ -65,7 +65,6 @@ export const useGameStore = defineStore("game", () => {
 	async function getPlayerDeck(index: number): Promise<Card[]> {
 		return (await engineService.getPlayerDeck(index)) ?? [];
 	}
-	
 
 	function isPlayerInTurn(index: number): boolean {
 		return index === currentPlayerIndex.value;
@@ -90,7 +89,7 @@ export const useGameStore = defineStore("game", () => {
 
 	function updateAllPlayerDecks() {
 		players.value.forEach(async (player) => {
-			player.deck = await engineService.getPlayerDeck(player.index) ?? [];
+			player.deck = (await engineService.getPlayerDeck(player.index)) ?? [];
 		});
 	}
 

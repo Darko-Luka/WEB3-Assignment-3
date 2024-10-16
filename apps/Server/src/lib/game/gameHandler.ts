@@ -85,6 +85,18 @@ export default class GameHandler {
 				})
 			);
 		});
+
+		WebSocketHandler.getInstance().subscribeEvent(this.type, "draw", ({ ws }) => {
+			const game = this.findGameByWebSocket(ws);
+			if (!game) return;
+
+			ws.send(
+				JSON.stringify({
+					type: "draw",
+					data: game.hand?.draw(),
+				})
+			);
+		});
 	}
 
 	private broadcastToAllMembersOfTheGame(gameId: string, data: any): void {

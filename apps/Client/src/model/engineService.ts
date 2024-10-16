@@ -74,8 +74,13 @@ export class EngineService implements EngineInterface {
 	get getDiscardPileTopCard(): Promise<Ref<Card | undefined, Card | undefined>> {
 		throw new Error("Method not implemented.");
 	}
+	
 	draw(): void {
-		throw new Error("Method not implemented.");
+		this.sendMessage({ type: "draw" });
+
+		this.subscribeOnMessage((event) => {
+			if (event.type !== "draw") return;
+		});
 	}
 	sayUno(index: number): void {
 		throw new Error("Method not implemented.");
