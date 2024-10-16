@@ -79,8 +79,8 @@ export const useGameStore = defineStore("game", () => {
 		return engineService.getTargetScore();
 	}
 
-	function nextTurn() {
-		currentPlayerIndex.value = engineService.getCurrentPlayer().index;
+	async function nextTurn() {
+		currentPlayerIndex.value = (await engineService.getCurrentPlayer()).index;
 	}
 
 	function updateAllPlayerDecks() {

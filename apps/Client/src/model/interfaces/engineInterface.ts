@@ -6,7 +6,7 @@ export interface EngineInterface {
 	getPlayerName(index: number): Promise<string | undefined>; // Darko // DONE
 	getPlayerScore(index: number): Promise<number | undefined>; // Done
 	getPlayerDeck(index: number): Promise<Card[] | undefined>; // Luka
-	getCurrentPlayer(): Promise<Player>; // Darko
+	getCurrentPlayer(): Promise<Player>; // Darko // DONE
 	play(cardIndex: number, nextColor?: CardColor): Promise<Card | undefined>; // Luka
 	get getDiscardPileTopCard(): Promise<Ref<Card | undefined, Card | undefined>>; // Darko
 	draw(): void; // Luka

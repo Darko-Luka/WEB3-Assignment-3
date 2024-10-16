@@ -44,6 +44,21 @@ export default class GameHandler {
 			GameHandler.games.get(gameId)?.set(username, null);
 		});
 
+		WebSocketHandler.getInstance().subscribeEvent(this.type, "getCurrentPlayer", ({ ws }) => {
+			const game = this.findGameByWebSocket(ws);
+			if (!game) return;
+
+			const playerIndex = game.hand?.playerInTurn() ?? -1;
+			const player = { name: game.hand?.player(playerIndex) ?? "", index: playerIndex };
+
+			ws.send(
+				JSON.stringify({
+					type: "getPlayerName",
+					data: player,
+				})
+			);
+		});
+
 		WebSocketHandler.getInstance().subscribeEvent(this.type, "getPlayerName", ({ ws, webSocketMessage }) => {
 			const game = this.findGameByWebSocket(ws);
 			if (!game) return;
