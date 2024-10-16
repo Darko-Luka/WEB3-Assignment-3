@@ -1,6 +1,7 @@
 import { type Ref } from "vue";
 import type { EngineInterface } from "./interfaces/engineInterface";
 import type { Card, CardColor, Player, UnoFailure } from "global-types";
+import { resolve } from "node:path";
 
 export class EngineService implements EngineInterface {
 	ws: WebSocket | null = null;
@@ -45,8 +46,17 @@ export class EngineService implements EngineInterface {
 	}
 
 	async getPlayerDeck(index: number): Promise<Card[] | undefined> {
-		throw new Error("Method not implemented.");
+		return new Promise((resolve) => {
+			this.sendMessage({ type: "getPlayerDeck", data: { index } });
+
+			this.subscribeOnMessage((event) => {
+				if (event.type !== "getPlayerDeck") return;
+
+				resolve(event.data);
+			});
+		});
 	}
+
 	async getCurrentPlayer(): Promise<Player> {
 		throw new Error("Method not implemented.");
 	}

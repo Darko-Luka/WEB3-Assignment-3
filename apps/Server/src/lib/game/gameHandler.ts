@@ -57,6 +57,20 @@ export default class GameHandler {
 				})
 			);
 		});
+
+		WebSocketHandler.getInstance().subscribeEvent(this.type, "getPlayerDeck", ({ ws, webSocketMessage }) => {
+			const game = this.findGameByWebSocket(ws);
+			if (!game) return;
+
+			const { index } = webSocketMessage.data;
+
+			ws.send(
+				JSON.stringify({
+					type: "getPlayerDeck",
+					data: game.hand?.playerHand(index),
+				})
+			);
+		});
 	}
 
 	private broadcastToAllMembersOfTheGame(gameId: string, data: any): void {
