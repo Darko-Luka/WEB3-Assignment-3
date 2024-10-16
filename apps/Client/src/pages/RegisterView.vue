@@ -5,7 +5,7 @@
 			<Input type="text" v-model="username" placeholder="Username" required />
 			<Input type="password" v-model="password" placeholder="Password" required />
 			<p class="text-xs text-red-500" v-if="authStore.error">{{ authStore.error }}</p>
-			<Button type="submit">Cancel</Button>
+			<Button type="submit">Register</Button>
 		</form>
 
 		<RouterLink to="/login">
@@ -26,7 +26,7 @@ const username = ref("");
 const password = ref("");
 const error = ref(authStore.error);
 
-const handleRegister = async () => {
+const handleRegister = async () => {	
 	await authStore.register(username.value, password.value);
 };
 </script>

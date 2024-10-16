@@ -86,6 +86,60 @@ export default class GameHandler {
 				})
 			);
 		});
+
+		WebSocketHandler.getInstance().subscribeEvent(this.type, "getPlayerDeck", ({ ws, webSocketMessage }) => {
+			const game = this.findGameByWebSocket(ws);
+			if (!game) return;
+
+			const { index } = webSocketMessage.data;
+
+			ws.send(
+				JSON.stringify({
+					type: "getPlayerDeck",
+					data: [...(game.hand?.playerHand(index) ?? [])],
+				})
+			);
+		});
+
+		WebSocketHandler.getInstance().subscribeEvent(this.type, "play", ({ ws, webSocketMessage }) => {
+			const game = this.findGameByWebSocket(ws);
+			if (!game) return;
+
+			const { cardIndex, nextColor } = webSocketMessage;
+
+			ws.send(
+				JSON.stringify({
+					type: "play",
+					data: game.hand?.play(cardIndex, nextColor),
+				})
+			);
+		});
+
+		WebSocketHandler.getInstance().subscribeEvent(this.type, "draw", ({ ws }) => {
+			const game = this.findGameByWebSocket(ws);
+			if (!game) return;
+
+			ws.send(
+				JSON.stringify({
+					type: "draw",
+					data: game.hand?.draw(),
+				})
+			);
+		});
+
+		WebSocketHandler.getInstance().subscribeEvent(this.type, "catchUnoFailure", ({ ws, webSocketMessage }) => {
+			const game = this.findGameByWebSocket(ws);
+			if (!game) return;
+
+			const { unoFailure } = webSocketMessage;
+
+			ws.send(
+				JSON.stringify({
+					type: "unoFailure",
+					data: (game.hand?.catchUnoFailure(unoFailure) ?? false),
+				})
+			);
+		});
 	}
 
 	private broadcastToAllMembersOfTheGame(gameId: string, data: any): void {

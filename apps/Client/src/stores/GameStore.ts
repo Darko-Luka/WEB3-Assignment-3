@@ -42,9 +42,15 @@ export const useGameStore = defineStore("game", () => {
 		nextTurn();
 	}
 
-	function play(cardIndex: number, nextColor?: CardColor) {
+	function draw() {
+		engineService.draw();
+		updateAllPlayerDecks();
+		nextTurn();
+	}
+
+	async function play(cardIndex: number, nextColor?: CardColor) {
 		try {
-			engineService.play(cardIndex, nextColor);
+			await engineService.play(cardIndex, nextColor);
 			updateAllPlayerDecks();
 			nextTurn();
 		} catch {
@@ -52,14 +58,12 @@ export const useGameStore = defineStore("game", () => {
 		}
 	}
 
-	function draw() {
-		engineService.draw();
-		updateAllPlayerDecks();
-		nextTurn();
-	}
-
 	async function getPlayerScore(index: number): Promise<number> {
 		return (await engineService.getPlayerScore(index)) ?? 0;
+	}
+
+	async function getPlayerDeck(index: number): Promise<Card[]> {
+		return (await engineService.getPlayerDeck(index)) ?? [];
 	}
 
 	function isPlayerInTurn(index: number): boolean {
@@ -71,8 +75,8 @@ export const useGameStore = defineStore("game", () => {
 		updateAllPlayerDecks();
 	}
 
-	function catchUnoFailure(unoFailure: UnoFailure) {
-		engineService.catchUnoFailure(unoFailure);
+	async function catchUnoFailure(unoFailure: UnoFailure) {
+		await engineService.catchUnoFailure(unoFailure);
 	}
 
 	function getTargetScore() {
@@ -84,14 +88,15 @@ export const useGameStore = defineStore("game", () => {
 	}
 
 	function updateAllPlayerDecks() {
-		players.value.forEach((player) => {
-			player.deck = engineService.getPlayerDeck(player.index) ?? [];
+		players.value.forEach(async (player) => {
+			player.deck = (await engineService.getPlayerDeck(player.index)) ?? [];
 		});
 	}
 
 	return {
 		joinGame,
 		getPlayerScore,
+		getPlayerDeck,
 		isPlayerInTurn,
 		play,
 		draw,

@@ -1,6 +1,9 @@
 import { type Ref } from "vue";
 import type { EngineInterface } from "./interfaces/engineInterface";
 import type { Card, CardColor, Player, UnoFailure } from "global-types";
+import { resolve } from "node:path";
+import { data } from "autoprefixer";
+import { eventNames } from "node:process";
 
 export class EngineService implements EngineInterface {
 	ws: WebSocket | null = null;
@@ -53,7 +56,15 @@ export class EngineService implements EngineInterface {
 	}
 
 	async getPlayerDeck(index: number): Promise<Card[] | undefined> {
-		throw new Error("Method not implemented.");
+		return new Promise((resolve) => {
+			this.sendMessage({ type: "getPlayerDeck", data: { index } });
+
+			this.subscribeOnMessage((event) => {
+				if (event.type !== "getPlayerDeck") return;
+
+				resolve(event.data);
+			});
+		});
 	}
 
 	async getCurrentPlayer(): Promise<Player> {
@@ -69,25 +80,52 @@ export class EngineService implements EngineInterface {
 	}
 
 	async play(cardIndex: number, nextColor?: CardColor): Promise<Card | undefined> {
-		throw new Error("Method not implemented.");
+		return new Promise((resolve) => {
+			this.sendMessage({ type: "play", data: { cardIndex, nextColor } });
+
+			this.subscribeOnMessage((event) => {
+				if (event.type !== "play") return;
+
+				resolve(event.data);
+			});
+		});
 	}
 	get getDiscardPileTopCard(): Promise<Ref<Card | undefined, Card | undefined>> {
 		throw new Error("Method not implemented.");
 	}
+
 	draw(): void {
-		throw new Error("Method not implemented.");
+		this.sendMessage({ type: "draw" });
+
+		this.subscribeOnMessage((event) => {
+			if (event.type !== "draw") return;
+		});
 	}
 	sayUno(index: number): void {
 		throw new Error("Method not implemented.");
 	}
 	async catchUnoFailure(unoFailure: UnoFailure): Promise<boolean> {
-		throw new Error("Method not implemented.");
+		return new Promise((resolve) => {
+			this.sendMessage({ type: "catchUnoFailure", data: { unoFailure } });
+
+			this.subscribeOnMessage((event) => {
+				if (event.type !== "catchUnoFailure") return;
+
+				resolve(event.data);
+			});
+		});
 	}
 	async getTargetScore(): Promise<number> {
 		throw new Error("Method not implemented.");
 	}
 	subscribeOnEnd(callback: () => void): void {
-		throw new Error("Method not implemented.");
+		this.subscribeOnMessage((event) => {
+			if(event.type !== "subscribeOnEnd")
+			{
+				callback();
+			}
+		})
+		
 	}
 	unsubscribeOnEnd(callback: () => void): void {
 		throw new Error("Method not implemented.");
