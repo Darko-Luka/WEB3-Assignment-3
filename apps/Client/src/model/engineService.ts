@@ -91,7 +91,15 @@ export class EngineService implements EngineInterface {
 		});
 	}
 	get getDiscardPileTopCard(): Promise<Ref<Card | undefined, Card | undefined>> {
-		throw new Error("Method not implemented.");
+		return new Promise((resolve) => {
+			this.sendMessage({ type: "getDiscardPileTopCard" });
+
+			this.subscribeOnMessage((event) => {
+				if (event.type !== "getDiscardPileTopCard") return;
+
+				resolve(event.data);
+			});
+		});
 	}
 
 	draw(): void {
@@ -101,9 +109,11 @@ export class EngineService implements EngineInterface {
 			if (event.type !== "draw") return;
 		});
 	}
+
 	sayUno(index: number): void {
-		throw new Error("Method not implemented.");
+		this.sendMessage({ type: "sayUno", data: { index } });
 	}
+
 	async catchUnoFailure(unoFailure: UnoFailure): Promise<boolean> {
 		return new Promise((resolve) => {
 			this.sendMessage({ type: "catchUnoFailure", data: { unoFailure } });
@@ -115,18 +125,27 @@ export class EngineService implements EngineInterface {
 			});
 		});
 	}
+
 	async getTargetScore(): Promise<number> {
-		throw new Error("Method not implemented.");
+		return new Promise((resolve) => {
+			this.sendMessage({ type: "getTargetScore" });
+
+			this.subscribeOnMessage((event) => {
+				if (event.type !== "getTargetScore") return;
+
+				resolve(event.data);
+			});
+		});
 	}
+
 	subscribeOnEnd(callback: () => void): void {
 		this.subscribeOnMessage((event) => {
-			if(event.type !== "subscribeOnEnd")
-			{
+			if (event.type !== "subscribeOnEnd") {
 				callback();
 			}
-		})
-		
+		});
 	}
+
 	unsubscribeOnEnd(callback: () => void): void {
 		throw new Error("Method not implemented.");
 	}
@@ -135,9 +154,6 @@ export class EngineService implements EngineInterface {
 		this.onMessage.push(callback);
 	}
 
-	private unsubscribeOnMessage(callback: (data: any) => void) {
-		this.onMessage = this.onMessage.filter((sub) => sub !== callback);
-	}
 
 	private sendMessage(object: any) {
 		this.ws?.send(JSON.stringify(object));

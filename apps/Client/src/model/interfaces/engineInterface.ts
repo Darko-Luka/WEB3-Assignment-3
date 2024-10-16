@@ -8,11 +8,10 @@ export interface EngineInterface {
 	getPlayerDeck(index: number): Promise<Card[] | undefined>; // Luka - Done (Ljubitelj Alrhusa)
 	getCurrentPlayer(): Promise<Player>; // Darko // DONE
 	play(cardIndex: number, nextColor?: CardColor): Promise<Card | undefined>; // Luka - Done (3 nutele)
-	get getDiscardPileTopCard(): Promise<Ref<Card | undefined, Card | undefined>>; // Darko
+	get getDiscardPileTopCard(): Promise<Ref<Card | undefined, Card | undefined>>; // Darko // DONE
 	draw(): void; // Luka - Done (ciganka)
-	sayUno(index: number): void; // Darko
+	sayUno(index: number): void; // Darko // DONE
 	catchUnoFailure(unoFailure: UnoFailure): Promise<boolean>; // Luka - Done (samo se zajebavat i prcit)
-	getTargetScore(): Promise<number>; // Darko
+	getTargetScore(): Promise<number>; // Darko // DONE
 	subscribeOnEnd(callback: () => void): void; // Luka - Done (sjebano rame)
-	unsubscribeOnEnd(callback: () => void): void; // Darko
 }

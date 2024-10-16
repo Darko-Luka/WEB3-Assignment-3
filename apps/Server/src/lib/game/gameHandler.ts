@@ -115,6 +115,18 @@ export default class GameHandler {
 			);
 		});
 
+		WebSocketHandler.getInstance().subscribeEvent(this.type, "getDiscardPileTopCard", ({ ws }) => {
+			const game = this.findGameByWebSocket(ws);
+			if (!game) return;
+
+			ws.send(
+				JSON.stringify({
+					type: "getDiscardPileTopCard",
+					data: game.hand?.discardPile().top(),
+				})
+			);
+		});
+
 		WebSocketHandler.getInstance().subscribeEvent(this.type, "draw", ({ ws }) => {
 			const game = this.findGameByWebSocket(ws);
 			if (!game) return;
@@ -127,6 +139,15 @@ export default class GameHandler {
 			);
 		});
 
+		WebSocketHandler.getInstance().subscribeEvent(this.type, "sayUno", ({ ws, webSocketMessage }) => {
+			const game = this.findGameByWebSocket(ws);
+			if (!game) return;
+
+			const { index } = webSocketMessage.data;
+
+			game.hand?.sayUno(index);
+		});
+
 		WebSocketHandler.getInstance().subscribeEvent(this.type, "catchUnoFailure", ({ ws, webSocketMessage }) => {
 			const game = this.findGameByWebSocket(ws);
 			if (!game) return;
@@ -136,7 +157,19 @@ export default class GameHandler {
 			ws.send(
 				JSON.stringify({
 					type: "unoFailure",
-					data: (game.hand?.catchUnoFailure(unoFailure) ?? false),
+					data: game.hand?.catchUnoFailure(unoFailure) ?? false,
+				})
+			);
+		});
+
+		WebSocketHandler.getInstance().subscribeEvent(this.type, "getTargetScore", ({ ws }) => {
+			const game = this.findGameByWebSocket(ws);
+			if (!game) return;
+
+			ws.send(
+				JSON.stringify({
+					type: "getTargetScore",
+					data: game.targetScore,
 				})
 			);
 		});

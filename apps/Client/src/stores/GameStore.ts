@@ -104,8 +104,7 @@ export const useGameStore = defineStore("game", () => {
 		catchUnoFailure,
 		updateAllPlayerDecks,
 		getTargetScore,
-		// discardPileTopCard: engineService.getDiscardPileTopCard,
-		discardPileTopCard: () => {},
+		discardPileTopCard: engineService.getDiscardPileTopCard,
 		players,
 	};
 });

@@ -43,7 +43,7 @@ const store = useGameStore();
 const router = useRouter();
 
 onMounted(() => {
-	store.createGame();
+	store.joinGame();
 });
 
 // We are always assuming the player (you), is index 0
