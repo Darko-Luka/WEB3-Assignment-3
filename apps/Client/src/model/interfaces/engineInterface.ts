@@ -9,9 +9,9 @@ export interface EngineInterface {
 	getCurrentPlayer(): Promise<Player>; // Darko
 	play(cardIndex: number, nextColor?: CardColor): Promise<Card | undefined>; // Luka - Done (3 nutele)
 	get getDiscardPileTopCard(): Promise<Ref<Card | undefined, Card | undefined>>; // Darko
-	draw(): void; // Luka
+	draw(): void; // Luka - Done (ciganka)
 	sayUno(index: number): void; // Darko
-	catchUnoFailure(unoFailure: UnoFailure): Promise<boolean>; // Luka
+	catchUnoFailure(unoFailure: UnoFailure): Promise<boolean>; // Luka - Done (samo se zajebavat i prcit)
 	getTargetScore(): Promise<number>; // Darko
 	subscribeOnEnd(callback: () => void): void; // Luka
 	unsubscribeOnEnd(callback: () => void): void; // Darko

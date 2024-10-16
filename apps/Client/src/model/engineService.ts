@@ -2,6 +2,8 @@ import { type Ref } from "vue";
 import type { EngineInterface } from "./interfaces/engineInterface";
 import type { Card, CardColor, Player, UnoFailure } from "global-types";
 import { resolve } from "node:path";
+import { data } from "autoprefixer";
+import { eventNames } from "node:process";
 
 export class EngineService implements EngineInterface {
 	ws: WebSocket | null = null;
@@ -74,7 +76,7 @@ export class EngineService implements EngineInterface {
 	get getDiscardPileTopCard(): Promise<Ref<Card | undefined, Card | undefined>> {
 		throw new Error("Method not implemented.");
 	}
-	
+
 	draw(): void {
 		this.sendMessage({ type: "draw" });
 
@@ -86,7 +88,15 @@ export class EngineService implements EngineInterface {
 		throw new Error("Method not implemented.");
 	}
 	async catchUnoFailure(unoFailure: UnoFailure): Promise<boolean> {
-		throw new Error("Method not implemented.");
+		return new Promise((resolve) => {
+			this.sendMessage({ type: "catchUnoFailure", data: { unoFailure } });
+
+			this.subscribeOnMessage((event) => {
+				if (event.type !== "catchUnoFailure") return;
+
+				resolve(event.data);
+			});
+		});
 	}
 	async getTargetScore(): Promise<number> {
 		throw new Error("Method not implemented.");

@@ -75,8 +75,8 @@ export const useGameStore = defineStore("game", () => {
 		updateAllPlayerDecks();
 	}
 
-	function catchUnoFailure(unoFailure: UnoFailure) {
-		engineService.catchUnoFailure(unoFailure);
+	async function catchUnoFailure(unoFailure: UnoFailure) {
+		await engineService.catchUnoFailure(unoFailure);
 	}
 
 	function getTargetScore() {

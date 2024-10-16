@@ -97,6 +97,20 @@ export default class GameHandler {
 				})
 			);
 		});
+
+		WebSocketHandler.getInstance().subscribeEvent(this.type, "catchUnoFailure", ({ ws, webSocketMessage }) => {
+			const game = this.findGameByWebSocket(ws);
+			if (!game) return;
+
+			const { unoFailure } = webSocketMessage;
+
+			ws.send(
+				JSON.stringify({
+					type: "unoFailure",
+					data: (game.hand?.catchUnoFailure(unoFailure) ?? false),
+				})
+			);
+		});
 	}
 
 	private broadcastToAllMembersOfTheGame(gameId: string, data: any): void {
