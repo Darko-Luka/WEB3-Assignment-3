@@ -3,7 +3,7 @@ import type { Ref } from "vue";
 
 export interface EngineInterface {
 	joinGame(username: string): Promise<Array<Player>>; // Done
-	getPlayerName(index: number): Promise<string | undefined>; // Darko
+	getPlayerName(index: number): Promise<string | undefined>; // Darko // DONE
 	getPlayerScore(index: number): Promise<number | undefined>; // Done
 	getPlayerDeck(index: number): Promise<Card[] | undefined>; // Luka
 	getCurrentPlayer(): Promise<Player>; // Darko

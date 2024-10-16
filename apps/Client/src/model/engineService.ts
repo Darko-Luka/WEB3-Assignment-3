@@ -29,7 +29,15 @@ export class EngineService implements EngineInterface {
 	}
 
 	async getPlayerName(index: number): Promise<string | undefined> {
-		throw new Error("Method not implemented.");
+		return new Promise((resolve) => {
+			this.sendMessage({ type: "getPlayerName", data: { index } });
+
+			this.subscribeOnMessage((event) => {
+				if (event.type !== "getPlayerName") return;
+
+				resolve(event.data);
+			});
+		});
 	}
 
 	async getPlayerScore(index: number): Promise<number | undefined> {
