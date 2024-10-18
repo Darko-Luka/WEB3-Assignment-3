@@ -3,14 +3,13 @@ import type { EngineInterface } from "@/model/interfaces/engineInterface";
 import type { Card, CardColor, Player, UnoFailure } from "global-types";
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { useRouter } from "vue-router";
 import { useAuthStore } from "./AuthStore";
 
 export const useGameStore = defineStore("game", () => {
 	const players = ref<(Player & { deck: Card[] })[]>([]);
+	const discardPileTopCard = ref<Card | undefined>(undefined);
 	const engineService: EngineInterface = new EngineService();
 	const currentPlayerIndex = ref(0);
-	const router = useRouter();
 	const authStore = useAuthStore();
 
 	async function joinGame() {
@@ -31,12 +30,29 @@ export const useGameStore = defineStore("game", () => {
 
 			await Promise.all(
 				players.value.map(async (player) => {
-					const score = await engineService.getPlayerScore(player.index);
-					query[player.name] = score ?? 0;
+					//const score = await engineService.getPlayerScore(player.index);
+					query[player.name] = 0;
 				})
 			);
 
-			router.push({ path: "/over", query });
+			//router.push({ path: "/over", query });
+		});
+
+		discardPileTopCard.value = await engineService.getDiscardPileTopCard();
+
+		engineService.onGameUpdate(async () => {
+			players.value = await Promise.all(
+				_players.map(async (player) => {
+					const deck = (await engineService.getPlayerDeck(player.index)) ?? [];
+					return {
+						...player,
+						deck,
+					};
+				})
+			);
+
+			discardPileTopCard.value = await engineService.getDiscardPileTopCard();
+			nextTurn();
 		});
 
 		nextTurn();
@@ -45,14 +61,12 @@ export const useGameStore = defineStore("game", () => {
 	function draw() {
 		engineService.draw();
 		updateAllPlayerDecks();
-		nextTurn();
 	}
 
 	async function play(cardIndex: number, nextColor?: CardColor) {
 		try {
 			await engineService.play(cardIndex, nextColor);
 			updateAllPlayerDecks();
-			nextTurn();
 		} catch {
 			alert("Illegal card play");
 		}
@@ -104,7 +118,8 @@ export const useGameStore = defineStore("game", () => {
 		catchUnoFailure,
 		updateAllPlayerDecks,
 		getTargetScore,
-		discardPileTopCard: engineService.getDiscardPileTopCard,
 		players,
+		discardPileTopCard,
+		currentPlayerIndex,
 	};
 });

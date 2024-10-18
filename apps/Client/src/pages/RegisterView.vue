@@ -26,7 +26,7 @@ const username = ref("");
 const password = ref("");
 const error = ref(authStore.error);
 
-const handleRegister = async () => {	
+const handleRegister = async () => {
 	await authStore.register(username.value, password.value);
 };
 </script>

@@ -2,10 +2,6 @@ import WebSocket from "ws";
 import { WebSocketHandler } from "../webSocketHandler";
 import { createUnoGame, Game } from "../../model/uno";
 
-// TODO:
-// On the frontend return the necessary data (array of players)
-// Implement the rich picture from whatsapp (Change the createGame to joinGame, ect..)
-
 export default class GameHandler {
 	type: string = "game";
 
@@ -15,6 +11,7 @@ export default class GameHandler {
 	init() {
 		WebSocketHandler.getInstance().subscribeEvent(this.type, "connect", ({ webSocketMessage, ws }) => {
 			const { username } = webSocketMessage.data;
+			const id = webSocketMessage.id;
 
 			const gameId = this.findGameByUsername(username);
 			if (!gameId) return;
@@ -24,12 +21,12 @@ export default class GameHandler {
 
 			if (this.checkIfAllPlayersAreConnected(gameId)) {
 				const players = this.getAllPlayersFromAGame(gameId) ?? [];
-				this.unoGames.set(gameId, createUnoGame({ targetScore: 500, cardsPerPlayer: 7, players }));
+				if (!this.unoGames.has(gameId))
+					this.unoGames.set(gameId, createUnoGame({ targetScore: 500, cardsPerPlayer: 7, players }));
 				this.broadcastToAllMembersOfTheGame(gameId, {
 					type: "gamePlayers",
-					data: {
-						players,
-					},
+					id,
+					data: players,
 				});
 			}
 		});
@@ -44,16 +41,19 @@ export default class GameHandler {
 			GameHandler.games.get(gameId)?.set(username, null);
 		});
 
-		WebSocketHandler.getInstance().subscribeEvent(this.type, "getCurrentPlayer", ({ ws }) => {
+		WebSocketHandler.getInstance().subscribeEvent(this.type, "getCurrentPlayer", ({ ws, webSocketMessage }) => {
 			const game = this.findGameByWebSocket(ws);
 			if (!game) return;
+
+			const id = webSocketMessage.id;
 
 			const playerIndex = game.hand?.playerInTurn() ?? -1;
 			const player = { name: game.hand?.player(playerIndex) ?? "", index: playerIndex };
 
 			ws.send(
 				JSON.stringify({
-					type: "getPlayerName",
+					type: "getCurrentPlayer",
+					id,
 					data: player,
 				})
 			);
@@ -64,10 +64,12 @@ export default class GameHandler {
 			if (!game) return;
 
 			const { index } = webSocketMessage.data;
+			const id = webSocketMessage.id;
 
 			ws.send(
 				JSON.stringify({
 					type: "getPlayerName",
+					id,
 					data: game.player(index),
 				})
 			);
@@ -78,10 +80,12 @@ export default class GameHandler {
 			if (!game) return;
 
 			const { index } = webSocketMessage.data;
+			const id = webSocketMessage.id;
 
 			ws.send(
 				JSON.stringify({
 					type: "getPlayerScore",
+					id,
 					data: game.score(index),
 				})
 			);
@@ -92,10 +96,12 @@ export default class GameHandler {
 			if (!game) return;
 
 			const { index } = webSocketMessage.data;
+			const id = webSocketMessage.id;
 
 			ws.send(
 				JSON.stringify({
 					type: "getPlayerDeck",
+					id,
 					data: [...(game.hand?.playerHand(index) ?? [])],
 				})
 			);
@@ -105,38 +111,54 @@ export default class GameHandler {
 			const game = this.findGameByWebSocket(ws);
 			if (!game) return;
 
-			const { cardIndex, nextColor } = webSocketMessage;
+			const { cardIndex, nextColor } = webSocketMessage.data;
+			const id = webSocketMessage.id;
 
 			ws.send(
 				JSON.stringify({
 					type: "play",
+					id,
 					data: game.hand?.play(cardIndex, nextColor),
 				})
 			);
+
+			this.broadcastToAllMembersOfTheGame(this.findGameByUsername(this.findUsernameByWebSocket(ws) ?? "") ?? "", {
+				type: "gameUpdate",
+			});
 		});
 
-		WebSocketHandler.getInstance().subscribeEvent(this.type, "getDiscardPileTopCard", ({ ws }) => {
+		WebSocketHandler.getInstance().subscribeEvent(this.type, "getDiscardPileTopCard", ({ ws, webSocketMessage }) => {
 			const game = this.findGameByWebSocket(ws);
 			if (!game) return;
+
+			const id = webSocketMessage.id;
 
 			ws.send(
 				JSON.stringify({
 					type: "getDiscardPileTopCard",
+					id,
 					data: game.hand?.discardPile().top(),
 				})
 			);
 		});
 
-		WebSocketHandler.getInstance().subscribeEvent(this.type, "draw", ({ ws }) => {
+		WebSocketHandler.getInstance().subscribeEvent(this.type, "draw", ({ ws, webSocketMessage }) => {
 			const game = this.findGameByWebSocket(ws);
 			if (!game) return;
+
+			const id = webSocketMessage.id;
 
 			ws.send(
 				JSON.stringify({
 					type: "draw",
+					id,
 					data: game.hand?.draw(),
 				})
 			);
+
+			this.broadcastToAllMembersOfTheGame(this.findGameByUsername(this.findUsernameByWebSocket(ws) ?? "") ?? "", {
+				type: "gameUpdate",
+			});
 		});
 
 		WebSocketHandler.getInstance().subscribeEvent(this.type, "sayUno", ({ ws, webSocketMessage }) => {
@@ -152,23 +174,28 @@ export default class GameHandler {
 			const game = this.findGameByWebSocket(ws);
 			if (!game) return;
 
-			const { unoFailure } = webSocketMessage;
+			const { unoFailure } = webSocketMessage.data;
+			const id = webSocketMessage.id;
 
 			ws.send(
 				JSON.stringify({
 					type: "unoFailure",
+					id,
 					data: game.hand?.catchUnoFailure(unoFailure) ?? false,
 				})
 			);
 		});
 
-		WebSocketHandler.getInstance().subscribeEvent(this.type, "getTargetScore", ({ ws }) => {
+		WebSocketHandler.getInstance().subscribeEvent(this.type, "getTargetScore", ({ ws, webSocketMessage }) => {
 			const game = this.findGameByWebSocket(ws);
 			if (!game) return;
+
+			const id = webSocketMessage.id;
 
 			ws.send(
 				JSON.stringify({
 					type: "getTargetScore",
+					id,
 					data: game.targetScore,
 				})
 			);

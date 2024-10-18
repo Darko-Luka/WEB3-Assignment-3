@@ -1,8 +1,7 @@
 <template>
-	<!--
-	<div class="w-full h-[720px] flex flex-col justify-between table-image">
+	<div v-if="connected" class="w-full h-[720px] flex flex-col justify-between table-image">
 		<div class="flex justify-between items-center">
-			<ScoreTarget :targetScore="store.getTargetScore()" />
+			<ScoreTarget :targetScore="targetScore" />
 			<div class="flex items-center justify-between w-1/2 mx-auto p-6">
 				<OpponentAvatar
 					v-for="player in store.players"
@@ -16,16 +15,15 @@
 		</div>
 
 		<div class="flex flex-row gap-64 justify-center">
-			<DrawPile :isActive="store.isPlayerInTurn(playerIndex)" />
+			<DrawPile :isActive="isPlayerInTurn" />
 			<DiscardPile />
 		</div>
 
 		<div class="flex items-center justify-center space-x-2">
-			<PlayerDeck :cards="store.players[playerIndex].deck" :isActive="store.isPlayerInTurn(playerIndex)" />
-			<Score :score="store.getPlayerScore(playerIndex)" />
+			<PlayerDeck v-if="currentPlayer?.deck" :cards="currentPlayer.deck" :isActive="isPlayerInTurn" />
+			<Score :score="score" />
 		</div>
 	</div>
-	-->
 </template>
 
 <script setup lang="ts">
@@ -35,25 +33,46 @@ import OpponentAvatar from "@/components/OpponentAvatar.vue";
 import PlayerDeck from "@/components/PlayerDeck.vue";
 import Score from "@/components/Score.vue";
 import ScoreTarget from "@/components/ScoreTarget.vue";
+import { useAuthStore } from "@/stores/AuthStore";
 import { useGameStore } from "@/stores/GameStore";
-import { onMounted } from "vue";
-import { useRouter } from "vue-router";
+import type { Card, Player } from "global-types";
+import { onMounted, ref, watch } from "vue";
 
 const store = useGameStore();
-const router = useRouter();
 
-onMounted(() => {
-	store.joinGame();
+const targetScore = ref(0);
+const score = ref(0);
+const authStore = useAuthStore();
+const currentPlayer = ref<(Player & { deck: Card[] }) | undefined>(undefined);
+const connected = ref(false);
+const isPlayerInTurn = ref(false);
+
+onMounted(async () => {
+	await store.joinGame();
+	currentPlayer.value = getPlayerByUsername(authStore.user?.username ?? "");
+	targetScore.value = await store.getTargetScore();
+	score.value = await store.getPlayerScore(currentPlayer.value?.index ?? -1);
+	isPlayerInTurn.value = currentPlayer.value?.index === store.currentPlayerIndex;
+	connected.value = true;
 });
 
-// We are always assuming the player (you), is index 0
-const playerIndex = 0;
+watch(
+	() => store.players,
+	() => (currentPlayer.value = getPlayerByUsername(authStore.user?.username ?? ""))
+);
 
-try {
-	// store.players[playerIndex].deck;
-} catch {
-	// check if the game was initialized properly, if no go back to the home view
-	router.push("/").then(() => location.reload());
+watch(
+	() => store.currentPlayerIndex,
+	() => (isPlayerInTurn.value = currentPlayer.value?.index === store.currentPlayerIndex)
+);
+
+function getPlayerByUsername(username: string): (Player & { deck: Card[] }) | undefined {
+	for (let index = 0; index < store.players.length; index++) {
+		const player = store.players[index];
+		if (player.name === username) return player;
+	}
+
+	return undefined;
 }
 </script>
 

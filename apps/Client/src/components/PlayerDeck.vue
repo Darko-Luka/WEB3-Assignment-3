@@ -8,7 +8,7 @@
 			class="first:ml-auto last:mr-auto"
 			@click="() => store.sayUno(playerIndex)"
 			v-if="cards.length === 1"
-			>Cancel</Button
+			>Say Uno!</Button
 		>
 	</ol>
 </template>
@@ -17,9 +17,9 @@
 import { defineProps } from "vue";
 import CardComponent from "./CardComponent.vue";
 import Button from "./ui/button/Button.vue";
-import type { Card, CardColor, CardType } from "../../../Server/src/model/deck";
 import { cn } from "@/lib/utils";
 import { useGameStore } from "@/stores/GameStore";
+import type { Card, CardColor, CardType } from "global-types";
 
 const store = useGameStore();
 

@@ -4,7 +4,7 @@
 			<Label class="text-black text-2xl">{{ name }}</Label>
 		</div>
 		<div class="flex flex-col pl-2 space-y-2">
-			<Score :score="store.getPlayerScore(id)" />
+			<Score :score="score" />
 			<Label class="text-white">{{ cards.length }} cards</Label>
 			<Button
 				v-if="cards.length === 1"
@@ -16,7 +16,7 @@
 					}
 				"
 				size="xs"
-				>Cancel</Button
+				>Catch Uno Failure</Button
 			>
 		</div>
 	</div>
@@ -25,11 +25,13 @@
 <script setup lang="ts">
 import { cn } from "@/lib/utils";
 import Label from "./ui/label/Label.vue";
-import { defineProps } from "vue";
+import { defineProps, onMounted, ref } from "vue";
 import Score from "./Score.vue";
 import { useGameStore } from "@/stores/GameStore";
-import type { Card } from "../../../Server/src/model/deck";
 import Button from "./ui/button/Button.vue";
+import type { Card } from "global-types";
+
+const score = ref<number>(0);
 
 const store = useGameStore();
 
@@ -39,6 +41,10 @@ const props = defineProps<{
 	name: string;
 	id: number;
 }>();
+
+onMounted(async () => {
+	score.value = await store.getPlayerScore(props.id);
+});
 
 function getClass() {
 	return cn(

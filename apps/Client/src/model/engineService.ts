@@ -1,22 +1,22 @@
-import { type Ref } from "vue";
+import uuid4 from "uuid4";
 import type { EngineInterface } from "./interfaces/engineInterface";
 import type { Card, CardColor, Player, UnoFailure } from "global-types";
-import { resolve } from "node:path";
-import { data } from "autoprefixer";
-import { eventNames } from "node:process";
 
 export class EngineService implements EngineInterface {
 	ws: WebSocket | null = null;
 	isConnected: boolean = false;
 	onMessage: Array<(data: any) => void> = [];
+	onGameUpdateCB?: () => void;
 
 	async joinGame(username: string): Promise<Array<Player>> {
 		return new Promise((resolve) => {
 			this.ws = new WebSocket("ws://localhost:3001?serverType=game&token=" + localStorage.getItem("token"));
 
+			const messageId = uuid4();
+
 			this.ws.onopen = () => {
 				this.isConnected = true;
-				this.sendMessage({ type: "connect", data: { username } });
+				this.sendMessage({ type: "connect", id: messageId, data: { username } });
 			};
 
 			this.ws.onmessage = (event) => {
@@ -25,89 +25,134 @@ export class EngineService implements EngineInterface {
 			};
 
 			this.subscribeOnMessage((event) => {
-				if (event.type !== "gamePlayers") return;
-				resolve(event.data);
+				if (event.type !== "gameUpdate") return;
+
+				if (this.onGameUpdateCB) this.onGameUpdateCB();
 			});
+
+			const onMessage = (event: any) => {
+				if (event.type !== "gamePlayers" || event.id !== messageId) return;
+
+				const players: string[] = event.data;
+
+				resolve(
+					players.map((player, index) => {
+						return { name: player, index };
+					})
+				);
+				this.unsubscribeOnMessage(onMessage);
+			};
+
+			this.subscribeOnMessage(onMessage);
 		});
 	}
 
 	async getPlayerName(index: number): Promise<string | undefined> {
 		return new Promise((resolve) => {
-			this.sendMessage({ type: "getPlayerName", data: { index } });
+			const messageId = uuid4();
+			this.sendMessage({ type: "getPlayerName", id: messageId, data: { index } });
 
-			this.subscribeOnMessage((event) => {
-				if (event.type !== "getPlayerName") return;
+			const onMessage = (event: any) => {
+				if (event.type !== "getPlayerName" || event.id !== messageId) return;
 
 				resolve(event.data);
-			});
+				this.unsubscribeOnMessage(onMessage);
+			};
+
+			this.subscribeOnMessage(onMessage);
 		});
 	}
 
 	async getPlayerScore(index: number): Promise<number | undefined> {
 		return new Promise((resolve) => {
-			this.sendMessage({ type: "getPlayerScore", data: { index } });
+			const messageId = uuid4();
 
-			this.subscribeOnMessage((event) => {
-				if (event.type !== "getPlayerScore") return;
+			this.sendMessage({ type: "getPlayerScore", id: messageId, data: { index } });
 
+			const onMessage = (event: any) => {
+				if (event.type !== "getPlayerScore" || event.id !== messageId) return;
 				resolve(event.data);
-			});
+				this.unsubscribeOnMessage(onMessage);
+			};
+			this.subscribeOnMessage(onMessage);
 		});
 	}
 
 	async getPlayerDeck(index: number): Promise<Card[] | undefined> {
 		return new Promise((resolve) => {
-			this.sendMessage({ type: "getPlayerDeck", data: { index } });
+			const messageId = uuid4();
 
-			this.subscribeOnMessage((event) => {
-				if (event.type !== "getPlayerDeck") return;
+			this.sendMessage({ type: "getPlayerDeck", id: messageId, data: { index } });
+
+			const onMessage = (event: any) => {
+				if (event.type !== "getPlayerDeck" || event.id !== messageId) return;
 
 				resolve(event.data);
-			});
+				this.unsubscribeOnMessage(onMessage);
+			};
+
+			this.subscribeOnMessage(onMessage);
 		});
 	}
 
 	async getCurrentPlayer(): Promise<Player> {
 		return new Promise((resolve) => {
-			this.sendMessage({ type: "getCurrentPlayer" });
+			const messageId = uuid4();
+			this.sendMessage({ type: "getCurrentPlayer", id: messageId });
 
-			this.subscribeOnMessage((event) => {
-				if (event.type !== "getCurrentPlayer") return;
+			const onMessage = (event: any) => {
+				if (event.type !== "getCurrentPlayer" || event.id !== messageId) return;
 
 				resolve(event.data);
-			});
+				this.unsubscribeOnMessage(onMessage);
+			};
+
+			this.subscribeOnMessage(onMessage);
 		});
 	}
 
 	async play(cardIndex: number, nextColor?: CardColor): Promise<Card | undefined> {
 		return new Promise((resolve) => {
-			this.sendMessage({ type: "play", data: { cardIndex, nextColor } });
+			const messageId = uuid4();
 
-			this.subscribeOnMessage((event) => {
-				if (event.type !== "play") return;
+			this.sendMessage({ type: "play", id: messageId, data: { cardIndex, nextColor } });
+
+			const onMessage = (event: any) => {
+				if (event.type !== "play" || event.id !== messageId) return;
 
 				resolve(event.data);
-			});
+				this.unsubscribeOnMessage(onMessage);
+			};
+
+			this.subscribeOnMessage(onMessage);
 		});
 	}
-	get getDiscardPileTopCard(): Promise<Ref<Card | undefined, Card | undefined>> {
+	async getDiscardPileTopCard(): Promise<Card | undefined> {
 		return new Promise((resolve) => {
-			this.sendMessage({ type: "getDiscardPileTopCard" });
+			const messageId = uuid4();
 
-			this.subscribeOnMessage((event) => {
-				if (event.type !== "getDiscardPileTopCard") return;
+			this.sendMessage({ type: "getDiscardPileTopCard", id: messageId });
+
+			const onMessage = (event: any) => {
+				if (event.type !== "getDiscardPileTopCard" || event.id !== messageId) return;
 
 				resolve(event.data);
-			});
+				this.unsubscribeOnMessage(onMessage);
+			};
+			this.subscribeOnMessage(onMessage);
 		});
 	}
 
 	draw(): void {
-		this.sendMessage({ type: "draw" });
+		const messageId = uuid4();
+		this.sendMessage({ type: "draw", id: messageId });
 
-		this.subscribeOnMessage((event) => {
-			if (event.type !== "draw") return;
-		});
+		const onMessage = (event: any) => {
+			if (event.type !== "draw" || event.id !== messageId) return;
+			this.unsubscribeOnMessage(onMessage);
+		};
+
+		this.subscribeOnMessage(onMessage);
 	}
 
 	sayUno(index: number): void {
@@ -116,25 +161,33 @@ export class EngineService implements EngineInterface {
 
 	async catchUnoFailure(unoFailure: UnoFailure): Promise<boolean> {
 		return new Promise((resolve) => {
-			this.sendMessage({ type: "catchUnoFailure", data: { unoFailure } });
+			const messageId = uuid4();
+			this.sendMessage({ type: "catchUnoFailure", id: messageId, data: { unoFailure } });
 
-			this.subscribeOnMessage((event) => {
-				if (event.type !== "catchUnoFailure") return;
+			const onMessage = (event: any) => {
+				if (event.type !== "catchUnoFailure" || event.id !== messageId) return;
 
 				resolve(event.data);
-			});
+				this.unsubscribeOnMessage(onMessage);
+			};
+
+			this.subscribeOnMessage(onMessage);
 		});
 	}
 
 	async getTargetScore(): Promise<number> {
 		return new Promise((resolve) => {
-			this.sendMessage({ type: "getTargetScore" });
+			const messageId = uuid4();
+			this.sendMessage({ type: "getTargetScore", id: messageId });
 
-			this.subscribeOnMessage((event) => {
-				if (event.type !== "getTargetScore") return;
+			const onMessage = (event: any) => {
+				if (event.type !== "getTargetScore" || event.id !== messageId) return;
 
 				resolve(event.data);
-			});
+				this.unsubscribeOnMessage(onMessage);
+			};
+
+			this.subscribeOnMessage(onMessage);
 		});
 	}
 
@@ -150,12 +203,19 @@ export class EngineService implements EngineInterface {
 		throw new Error("Method not implemented.");
 	}
 
+	onGameUpdate(callback: () => void): void {
+		this.onGameUpdateCB = callback;
+	}
+
 	private subscribeOnMessage(callback: (data: any) => void) {
 		this.onMessage.push(callback);
 	}
 
+	private unsubscribeOnMessage(callback: (data: any) => void) {
+		this.onMessage = this.onMessage.filter((sub) => sub !== callback);
+	}
 
 	private sendMessage(object: any) {
-		this.ws?.send(JSON.stringify(object));
+		if (this.isConnected) this.ws?.send(JSON.stringify(object));
 	}
 }
